@@ -29,7 +29,7 @@ function createPlayer(player, identificator) {
 
 	let $life = document.createElement('div');
 	$life.classList.add('life');
-	$life.style.width = '100%';
+	$life.style.width = identificator.hp, '100%';
 
 	let $name = document.createElement('div');
 	$name.classList.add('name');
