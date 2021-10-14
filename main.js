@@ -18,6 +18,8 @@ let player2 = {
 	},
 }
 
+const $arenas = document.querySelector('.arenas')
+
 // task 2
 function createPlayer(player, identificator) {
 	//player
@@ -48,7 +50,6 @@ function createPlayer(player, identificator) {
 
 	$character.appendChild($characterImg);
 
-	const $arenas = document.querySelector('.arenas')
 	$arenas.appendChild($player);
 
 }
