@@ -29,15 +29,26 @@ function changeHP(player) {
 
 	const $playerLife = document.querySelector('.player' + player.player + ' .life');
 
-	//HomeWork #3 task 2  ---Math.ceil(Math.random() * 10); or Math.floor(Math.random() * 10 + 1)
-
-	player.hp -= Math.floor(Math.random() * 20 + 1)
+	hpRandomDamage(player); //HomeWork #3 task 2  ---Math.ceil(Math.random() * 10); or Math.floor(Math.random() * 10 + 1)
 
 	if (player.hp < 0) { player.hp = 0; } //HomeWork #3 Task #1 say no to negative player`s hp
 
 	$playerLife.style.width = player.hp + '%';
 	console.log(player.name + ' ' + player.hp + ' hp ' + 'left');
-	//HomeWork #3 Task #3
+
+	announceWinner(player); 	//HomeWork #3 Task #3
+
+}
+
+//HomeWork #3 task 2  ---Math.ceil(Math.random() * 10); or Math.floor(Math.random() * 10 + 1)
+
+function hpRandomDamage(player) {
+	player.hp -= Math.floor(Math.random() * 20 + 1);
+}
+
+//HomeWork #3 Task #3
+
+function announceWinner(player) {
 	if (player.hp <= 0) {
 		if (player1.hp < player2.hp) {
 			$arenas.appendChild(playerWins(player2.name));
@@ -48,7 +59,6 @@ function changeHP(player) {
 			$randomButton.disabled = true;
 		}
 	}
-
 }
 
 function playerWins(name) {
