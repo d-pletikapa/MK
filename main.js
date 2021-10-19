@@ -87,8 +87,6 @@ function elHP() {
 function renderHP() {
 	console.log(this.elHP());
 	this.elHP().style.width = this.hp + '%';
-	return this.elHP;
-
 
 }
 
@@ -98,11 +96,13 @@ $randomButton.addEventListener('click', function () {
 	player1.changeHP(20);
 	player2.changeHP(20);
 
+	player1.elHP();
+	player2.elHP();
+
 	player1.renderHP();
 	player2.renderHP();
 
-	player1.elHP();
-	player2.elHP();
+
 
 
 	if (player1.hp === 0 || player2.hp === 0) { $randomButton.disabled = true; createReloadButton(); }
