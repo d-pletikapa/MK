@@ -1,3 +1,7 @@
+const $arenas = document.querySelector('.arenas');
+const $formFight = document.querySelector('.control');
+const $chat = document.querySelector('.chat');
+
 const player1 = {
 	player: 1,
 	name: 'Scorpion',
@@ -6,7 +10,7 @@ const player1 = {
 	elHP,
 	renderHP,
 	img: 'http://reactmarathon-api.herokuapp.com/assets/scorpion.gif',
-	weapons: ['fist', 'leg', 'poisonspit'],
+	weapons: ['fist', 'leg', 'poisonSpit'],
 	attack: function () {
 		console.log(player1.name + 'Fight...')
 	},
@@ -19,15 +23,11 @@ const player2 = {
 	elHP,
 	renderHP,
 	img: 'http://reactmarathon-api.herokuapp.com/assets/subzero.gif',
-	weapons: ['fist', 'leg', 'frostball'],
+	weapons: ['fist', 'leg', 'frostBall'],
 	attack: function () {
 		console.log(player2.name + 'Fight...')
 	},
 }
-const $arenas = document.querySelector('.arenas');
-//const $randomButton = document.querySelector('.button');
-
-const $formFight = document.querySelector('.control');
 
 const HIT = {
 	head: 30,
@@ -35,6 +35,43 @@ const HIT = {
 	foot: 20,
 }
 const ATTACK = ['head', 'body', 'foot'];
+
+generateLogs('start', player1.name, player2.name);
+
+function generateLogs(type, player1, player2) {
+	let text;
+	let el;
+	let currentTime = new Date().toLocaleTimeString().slice(0, 5);
+	/*let hours = date.getHours();
+	let minutes = date.getMinutes();
+	let seconds = date.getSeconds();
+	let currentTime = `${hours}:${minutes}:${seconds}`;
+	*/
+
+	switch (type) {
+		case 'hit':
+			text = logs[type][getRandom(logs[type].length - 1)].replace('[playerKick]', player1.name).replace('[playerDefence]', player2.name);
+			el = `<p>${currentTime} ${text} -${enemyAttack().value}HP. ${player2.name} ${player2.hp}/100.</p>`;
+			break;
+		case 'defence':
+			text = logs[type][getRandom(logs[type].length - 1)].replace('[playerKick]', player2.name).replace('[playerDefence]', player1.name);
+			el = `<p>${currentTime} ${text} -${playerAttack().value}HP. ${player1.name} ${player1.hp}/100.</p>`;
+			break;
+		case 'start':
+			text = logs[type].replace('[time]', currentTime).replace('[player1]', player1).replace('[player2]', player2);
+			el = `<p>${text}</p>`;
+			break;
+		case 'draw':
+			text = logs[type];
+			el = `<p>${currentTime} ${text}</p>`;
+			break;
+		case 'end':
+			text = logs[type][getRandom(logs[type].length - 1)].replace('[playerWins]', player1).replace('[playerLose]', player2);
+			el = `<p>${currentTime} ${text}</p>`;
+			break;
+	}
+	$chat.insertAdjacentHTML('afterbegin', el);
+};
 
 
 function getRandom(num) {
@@ -50,27 +87,23 @@ function createElement(tag, className) {
 	return $tag;
 };
 
-function createPlayer(identificator) {
-
-	const $player = createElement('div', 'player' + identificator.player);
+function createPlayer(playerId) {
+	const $player = createElement('div', 'player' + playerId.player);
 	const $progressbar = createElement('div', 'progressbar');
 	const $life = createElement('div', 'life');
 	const $name = createElement('div', 'name');
 	const $character = createElement('div', 'character');
-
 	const $characterImg = createElement('img');
-
-	$player.appendChild($progressbar);
 	$player.appendChild($character);
+	$player.appendChild($progressbar);
+	$character.appendChild($characterImg);
 	$progressbar.appendChild($life);
 	$progressbar.appendChild($name);
-	$character.appendChild($characterImg);
 
-	$characterImg.src = identificator.img;
-	$life.style.width = identificator.hp;
-	$name.innerText = identificator.name;
+	$characterImg.src = playerId.img;
+	$life.style.width = playerId.hp;
+	$name.innerText = playerId.name;
 
-	//$arenas.appendChild($player); => return $player;
 	return $player;
 }
 
@@ -85,17 +118,9 @@ function enemyAttack() {
 		hit,
 		defence,
 	}
-
-	//console.log('###: hit', hit);
-	//console.log('###: defence', defence);
 };
 
-$formFight.addEventListener('submit', function (e) {
-	e.preventDefault();
-	//console.dir($formFight);
-	const enemy = enemyAttack();
-	//console.log('###: enemy', enemy);
-
+function playerAttack() {
 	const attack = {};
 	//console.dir(item);
 	for (let item of $formFight) {
@@ -108,50 +133,51 @@ $formFight.addEventListener('submit', function (e) {
 		}
 		item.checked = false;
 	}
-	console.log('###: a', attack);
-	console.log('###: e', enemy);
-	console.log(attack.value)
-	console.log(enemy.value)
 
-	// Проверка защиты
-	if (attack.hit === enemy.defence) {
-		attack.value = 0;
-	}
+	return attack;
+};
 
-	else if (enemy.hit === attack.defence) {
-		enemy.value = 0;
-	};
-	console.log(attack.value)
-	console.log(enemy.value)
-
-	if (player1.hp != 0 || player2.hp != 0) {
-
-		player1.changeHP(attack.value);
-		//console.log('### Scorpion Enemy ' + 'deals ' + enemy.value)
-		player1.changeHP.call(player2, enemy.value);
-		elHP.call(player1);
-		elHP.call(player2);
-		player1.renderHP();
-		player2.renderHP();
-		//console.log('### Subzero Atacker ' + 'deals ' + attack.value)
-	}
-
+function showResult() {
 	if (player1.hp === 0 && player2.hp > player1.hp) {
+		generateLogs('end', player2.name, player1.name);
 		$arenas.appendChild(playerWins(player2.name));
 	}
 
 	else if (player2.hp === 0 && player2.hp < player1.hp) {
+		generateLogs('end', player1.name, player2.name);
 		$arenas.appendChild(playerWins(player1.name));
 	}
 	else if (player1.hp === 0 && player2.hp === 0) {
+		generateLogs('draw');
 		$arenas.appendChild(playerWins());
 
+	}
+}
+
+$formFight.addEventListener('submit', function (e) {
+	e.preventDefault();
+	const enemy = enemyAttack();
+	const player = playerAttack();
+
+	if (player1.hp != 0 || player2.hp != 0) {
+
+		if (player.defence !== enemy.hit) {
+			player1.changeHP(player.value);
+			player1.renderHP();
+			generateLogs('hit', player2, player1);
+		}
+
+		if (enemy.defence !== player.hit) {
+			player2.changeHP(enemy.value);
+			player2.renderHP();
+			generateLogs('hit', player1, player2);
+		}
+		showResult();
 	}
 });
 
 function changeHP(getRandom) {
 	//player.hp -= Math.floor(Math.random() * 20 + 1);
-
 	this.hp -= getRandom;
 	if (this.hp < 0) { this.hp = 0; }
 	console.log(this.name + ' ' + this.hp + ' hp ' + 'left');
@@ -163,11 +189,9 @@ function elHP() {
 }
 
 function renderHP() {
-	//console.log(this.elHP());
 	this.elHP().style.width = this.hp + '%';
 }
 
-// Task #2
 function createReloadButton() {
 	const $reloadDiv = createElement('div', 'reloadWrap');
 	const $reloadButton = createElement('button', 'button');
@@ -181,7 +205,6 @@ function createReloadButton() {
 }
 
 function playerWins(name) {
-
 	const $winTitle = createElement('div', 'loseTitle');
 	if (name) {
 		$winTitle.innerText = name + ' wins';
