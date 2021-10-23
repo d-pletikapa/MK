@@ -124,22 +124,18 @@ $formFight.addEventListener('submit', function (e) {
 	console.log(attack.value)
 	console.log(enemy.value)
 
-	player1.changeHP(attack.value);
-	//console.log('### Scorpion Enemy ' + 'deals ' + enemy.value)
-	player1.changeHP.call(player2, enemy.value);
-	//console.log('### Subzero Atacker ' + 'deals ' + attack.value)
+	if (player1.hp != 0 || player2.hp != 0) {
 
-	elHP.call(player1);
-	elHP.call(player2);
+		player1.changeHP(attack.value);
+		//console.log('### Scorpion Enemy ' + 'deals ' + enemy.value)
+		player1.changeHP.call(player2, enemy.value);
+		elHP.call(player1);
+		elHP.call(player2);
+		player1.renderHP();
+		player2.renderHP();
+		//console.log('### Subzero Atacker ' + 'deals ' + attack.value)
+	}
 
-	player1.renderHP();
-	player2.renderHP();
-	/*
-		if (player1.hp === 0 || player2.hp === 0) {
-			createReloadButton();
-		}
-		else
-		*/
 	if (player1.hp === 0 && player2.hp > player1.hp) {
 		$arenas.appendChild(playerWins(player2.name));
 	}
