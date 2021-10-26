@@ -1,39 +1,20 @@
-const $arenas = document.querySelector('.arenas');
+import { logs } from './logs.js';
+import { player1, player2, createPlayer } from './players.js';
+import { getRandom, createReloadButton, createElement } from './engine.js';
+//console.log(logs);
+
+export const $arenas = document.querySelector('.arenas');
 const $formFight = document.querySelector('.control');
 const $chat = document.querySelector('.chat');
-
-const player1 = {
-	player: 1,
-	name: 'Scorpion',
-	hp: 30,
-	changeHP,
-	elHP,
-	renderHP,
-	img: 'http://reactmarathon-api.herokuapp.com/assets/scorpion.gif',
-	weapons: ['fist', 'leg', 'poisonSpit'],
-	attack: function () {
-		console.log(player1.name + 'Fight...')
-	},
-}
-const player2 = {
-	player: 2,
-	name: 'Subzero',
-	hp: 30,
-	changeHP,
-	elHP,
-	renderHP,
-	img: 'http://reactmarathon-api.herokuapp.com/assets/subzero.gif',
-	weapons: ['fist', 'leg', 'frostBall'],
-	attack: function () {
-		console.log(player2.name + 'Fight...')
-	},
-}
+const $buttonWrap = document.querySelector('.buttonWrap .button');
+console.log($buttonWrap);
 
 const HIT = {
 	head: 30,
 	body: 25,
 	foot: 20,
 }
+
 const ATTACK = ['head', 'body', 'foot'];
 
 generateLogs('start', player1.name, player2.name);
@@ -42,11 +23,6 @@ function generateLogs(type, player1, player2) {
 	let text;
 	let el;
 	let currentTime = new Date().toLocaleTimeString().slice(0, 5);
-	/*let hours = date.getHours();
-	let minutes = date.getMinutes();
-	let seconds = date.getSeconds();
-	let currentTime = `${hours}:${minutes}:${seconds}`;
-	*/
 
 	switch (type) {
 		case 'hit':
@@ -74,43 +50,10 @@ function generateLogs(type, player1, player2) {
 };
 
 
-function getRandom(num) {
-	return Math.ceil(Math.random() * num);
-}
-
-function createElement(tag, className) {
-
-	const $tag = document.createElement(tag);
-	if (className) {
-		$tag.classList.add(className);
-	}
-	return $tag;
-};
-
-function createPlayer(playerId) {
-	const $player = createElement('div', 'player' + playerId.player);
-	const $progressbar = createElement('div', 'progressbar');
-	const $life = createElement('div', 'life');
-	const $name = createElement('div', 'name');
-	const $character = createElement('div', 'character');
-	const $characterImg = createElement('img');
-	$player.appendChild($character);
-	$player.appendChild($progressbar);
-	$character.appendChild($characterImg);
-	$progressbar.appendChild($life);
-	$progressbar.appendChild($name);
-
-	$characterImg.src = playerId.img;
-	$life.style.width = playerId.hp;
-	$name.innerText = playerId.name;
-
-	return $player;
-}
-
 $arenas.appendChild(createPlayer(player1));
 $arenas.appendChild(createPlayer(player2));
 
-function enemyAttack() {
+const enemyAttack = () => {
 	const hit = ATTACK[getRandom(3) - 1]
 	const defence = ATTACK[getRandom(3) - 1]
 	return {
@@ -154,7 +97,7 @@ function showResult() {
 	}
 }
 
-$formFight.addEventListener('submit', function (e) {
+$formFight.addEventListener('submit', (e) => {
 	e.preventDefault();
 	const enemy = enemyAttack();
 	const player = playerAttack();
@@ -176,41 +119,16 @@ $formFight.addEventListener('submit', function (e) {
 	}
 });
 
-function changeHP(getRandom) {
-	//player.hp -= Math.floor(Math.random() * 20 + 1);
-	this.hp -= getRandom;
-	if (this.hp < 0) { this.hp = 0; }
-	console.log(this.name + ' ' + this.hp + ' hp ' + 'left');
-	return this.hp;
-}
-
-function elHP() {
-	return document.querySelector('.player' + this.player + ' .life');
-}
-
-function renderHP() {
-	this.elHP().style.width = this.hp + '%';
-}
-
-function createReloadButton() {
-	const $reloadDiv = createElement('div', 'reloadWrap');
-	const $reloadButton = createElement('button', 'button');
-	$reloadButton.innerText = 'Restart';
-	$reloadDiv.appendChild($reloadButton);
-	$arenas.appendChild($reloadDiv);
-
-	$reloadButton.addEventListener('click', function () {
-		window.location.reload();
-	});
-}
-
 function playerWins(name) {
 	const $winTitle = createElement('div', 'loseTitle');
+	$buttonWrap.disabled = true;
+	//$buttonWrap.style.display = 'none';
 	if (name) {
 		$winTitle.innerText = name + ' wins';
 	} else {
 		$winTitle.innerText = 'TIE';
 	}
 	createReloadButton();
+	$buttonWrap.style.display = 'none';
 	return $winTitle;
 }
