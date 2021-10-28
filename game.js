@@ -7,6 +7,7 @@ export class Game {
 		const $formFight = document.querySelector('.control');
 		const $chat = document.querySelector('.chat');
 		const $buttonWrap = document.querySelector('.buttonWrap .button');
+		const getRandom = (num) => Math.ceil(Math.random() * num);
 		//console.log($buttonWrap);
 
 		const player1 = new Player({
@@ -62,6 +63,38 @@ export class Game {
 
 		const ATTACK = ['head', 'body', 'foot'];
 
+		generateLogs('start', player1, player2);
+
+		function generateLogs(type, { name, hp } = {}, { name: playerName2, hp: playerHp2 } = {}) {
+			let text;
+			let el;
+			let currentTime = new Date().toLocaleTimeString().slice(0, 5);
+
+			switch (type) {
+				case 'hit':
+					text = logs[type][getRandom(logs[type].length - 1)].replace('[playerKick]', name).replace('[playerDefence]', playerName2);
+					el = `<p>${currentTime} ${text} -${enemyAttack().value}HP. ${playerName2} ${playerHp2}/100.</p>`;
+					break;
+				case 'defence':
+					text = logs[type][getRandom(logs[type].length - 1)].replace('[playerKick]', playerName2).replace('[playerDefence]', name);
+					el = `<p>${currentTime} ${text} -${playerAttack().value}HP. ${name} ${hp}/100.</p>`;
+					break;
+				case 'start':
+					text = logs[type].replace('[time]', currentTime).replace('[player1]', name).replace('[player2]', playerName2);
+					el = `<p>${text}</p>`;
+					break;
+				case 'draw':
+					text = logs[type];
+					el = `<p>${currentTime} ${text}</p>`;
+					break;
+				case 'end':
+					text = logs[type][getRandom(logs[type].length - 1)].replace('[playerWins]', name).replace('[playerLose]', playerName2);
+					el = `<p>${currentTime} ${text}</p>`;
+					break;
+			}
+			$chat.insertAdjacentHTML('afterbegin', el);
+		};
+
 		$formFight.addEventListener('submit', (e) => {
 			e.preventDefault();
 			const { hit: hitEnemy, defence: DefenceEnemy, value: valueEnemy } = enemyAttack();
@@ -70,13 +103,13 @@ export class Game {
 			if (player1.hp != 0 || player2.hp != 0) {
 
 				if (defence !== hitEnemy) {
-					player1.changeHP(value);
+					player1.changeHP(valueEnemy);
 					player1.renderHP();
 					generateLogs('hit', player2, player1);
 				}
 
 				if (DefenceEnemy !== hit) {
-					player2.changeHP(valueEnemy);
+					player2.changeHP(value);
 					player2.renderHP();
 					generateLogs('hit', player1, player2);
 				}
@@ -111,37 +144,6 @@ export class Game {
 			return attack;
 		};
 
-		generateLogs('start', player1, player2);
-
-		function generateLogs(type, { name, hp } = {}, { name: playerName2, hp: playerHp2 } = {}) {
-			let text;
-			let el;
-			let currentTime = new Date().toLocaleTimeString().slice(0, 5);
-
-			switch (type) {
-				case 'hit':
-					text = logs[type][getRandom(logs[type].length - 1)].replace('[playerKick]', name).replace('[playerDefence]', playerName2);
-					el = `<p>${currentTime} ${text} -${enemyAttack().value}HP. ${playerName2} ${playerHp2}/100.</p>`;
-					break;
-				case 'defence':
-					text = logs[type][getRandom(logs[type].length - 1)].replace('[playerKick]', playerName2).replace('[playerDefence]', name);
-					el = `<p>${currentTime} ${text} -${playerAttack().value}HP. ${name} ${hp}/100.</p>`;
-					break;
-				case 'start':
-					text = logs[type].replace('[time]', currentTime).replace('[player1]', name).replace('[player2]', playerName2);
-					el = `<p>${text}</p>`;
-					break;
-				case 'draw':
-					text = logs[type];
-					el = `<p>${currentTime} ${text}</p>`;
-					break;
-				case 'end':
-					text = logs[type][getRandom(logs[type].length - 1)].replace('[playerWins]', name).replace('[playerLose]', playerName2);
-					el = `<p>${currentTime} ${text}</p>`;
-					break;
-			}
-			$chat.insertAdjacentHTML('afterbegin', el);
-		};
 
 		function showResult() {
 			if (player1.hp === 0 && player2.hp > player1.hp) {
@@ -173,8 +175,6 @@ export class Game {
 			$buttonWrap.style.display = 'none';
 			return $winTitle;
 		};
-
-		const getRandom = (num) => Math.ceil(Math.random() * num);
 
 		function createReloadButton() {
 			const $reloadDiv = createElement('div', 'reloadWrap');
