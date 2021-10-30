@@ -1,8 +1,32 @@
 import { logs } from './logs.js';
-import { Player } from './player.js';
+import Player from './player.js';
+import { createElement } from './player.js';
+
+let player1;
+let player2;
 export class Game {
 	//constructor(props) {	}
-	start = () => {
+
+	getPlayer = async () => {
+		const body = await fetch('https://reactmarathon-api.herokuapp.com/api/mk/players', { method: 'GET' }).then(res => res.json());
+		console.log('body:', body);
+		return body;
+	};
+
+	getEnemyPlayer = async () => {
+		const enemyBody = await fetch('https://reactmarathon-api.herokuapp.com/api/mk/player/choose', { method: 'GET' }).then(res => res.json());
+		console.log('body:', enemyBody);
+		return enemyBody;
+	};
+
+	start = async () => {
+
+		const HIT = {
+			head: 30,
+			body: 25,
+			foot: 20,
+		}
+		const ATTACK = ['head', 'body', 'foot'];
 		const $arenas = document.querySelector('.arenas');
 		const $formFight = document.querySelector('.control');
 		const $chat = document.querySelector('.chat');
@@ -10,58 +34,46 @@ export class Game {
 		const getRandom = (num) => Math.ceil(Math.random() * num);
 		//console.log($buttonWrap);
 
-		const player1 = new Player({
+		const players = await this.getPlayer();
+		const enemyPLayer = await this.getEnemyPlayer();
+
+		console.log('players:', players)
+		console.log('enemyPLayer:', enemyPLayer)
+		const p2 = enemyPLayer;
+		console.log('p1, p2:', p2)
+
+		const p1 = JSON.parse(localStorage.getItem('player1'));
+		//const p1 = players[getRandom(players.length) - 1];
+		console.log('p1:', p1)
+
+		player1 = new Player({
+			...p1,
 			player: 1,
-			name: 'Scorpion',
-			hp: 30,
-			img: 'http://reactmarathon-api.herokuapp.com/assets/scorpion.gif',
-		})
+			rootSelector: 'arenas',
+		});
 
-		const player2 = new Player({
+		player2 = new Player({
+			...p2,
 			player: 2,
-			name: 'Subzero',
-			hp: 30,
-			img: 'http://reactmarathon-api.herokuapp.com/assets/subzero.gif',
-		})
+			rootSelector: 'arenas',
+		});
 
-		const createElement = (tag, className) => {
-			const $tag = document.createElement(tag);
-			if (className) {
-				$tag.classList.add(className);
-			}
-			return $tag;
-		};
+		player1.createPlayer();
+		player2.createPlayer();
 
-		function createPlayer({ player, hp, name, img }) {
-			const $player = createElement('div', 'player' + `${player}`);
-			const $progressbar = createElement('div', 'progressbar');
-			const $life = createElement('div', 'life');
-			const $name = createElement('div', 'name');
-			const $character = createElement('div', 'character');
-			const $characterImg = createElement('img');
-			$player.appendChild($character);
-			$player.appendChild($progressbar);
-			$character.appendChild($characterImg);
-			$progressbar.appendChild($life);
-			$progressbar.appendChild($name);
+		// let player1 = new Player({
+		// 	player: 1,
+		// 	name: 'Scorpion',
+		// 	hp: 30,
+		// 	img: 'http://reactmarathon-api.herokuapp.com/assets/scorpion.gif',
+		// })
 
-			$characterImg.src = img;
-			$life.style.width = hp;
-			$name.innerText = name;
-
-			return $player;
-		}
-
-		$arenas.appendChild(createPlayer(player1));
-		$arenas.appendChild(createPlayer(player2));
-
-		const HIT = {
-			head: 30,
-			body: 25,
-			foot: 20,
-		}
-
-		const ATTACK = ['head', 'body', 'foot'];
+		// let player2 = new Player({
+		// 	player: 2,
+		// 	name: 'Subzero',
+		// 	hp: 30,
+		// 	img: 'http://reactmarathon-api.herokuapp.com/assets/subzero.gif',
+		// })
 
 		generateLogs('start', player1, player2);
 
@@ -97,6 +109,7 @@ export class Game {
 
 		$formFight.addEventListener('submit', (e) => {
 			e.preventDefault();
+
 			const { hit: hitEnemy, defence: DefenceEnemy, value: valueEnemy } = enemyAttack();
 			const { hit, defence, value } = playerAttack();
 
@@ -116,16 +129,28 @@ export class Game {
 				showResult();
 			}
 		});
-
-		const enemyAttack = () => {
-			const hit = ATTACK[getRandom(3) - 1]
-			const defence = ATTACK[getRandom(3) - 1]
-			return {
-				value: getRandom(HIT[hit]),
-				hit,
-				defence,
-			}
-		};
+	
+				const enemyAttack = () => {
+					const hit = ATTACK[getRandom(3) - 1]
+					const defence = ATTACK[getRandom(3) - 1]
+					return {
+						value: getRandom(HIT[hit]),
+						hit,
+						defence,
+					}
+				};
+					
+		// const getEnemyAttack = async ({ hit, defence } = playerAttack()) => {
+		// 	const body = await fetch('http://reactmarathon-api.herokuapp.com/api/mk/player/fight', {
+		// 		method: 'POST',
+		// 		body: JSON.stringify({
+		// 			hit: hit,
+		// 			defence: defence,
+		// 		})
+		// 	});
+		// 	let result = await body.json();
+		// 	return result;
+		// };
 
 		function playerAttack() {
 			const attack = {};
@@ -140,9 +165,12 @@ export class Game {
 				}
 				item.checked = false;
 			}
-
 			return attack;
 		};
+
+		// fight = async () => {
+		// 	const { player1: { hit: hit, defence: defence, value }, player2: { hit: hitEnemy, defence: DefenceEnemy, valueEnemy } } = await this.getEnemyAttack();
+		// };
 
 
 		function showResult() {
@@ -184,7 +212,8 @@ export class Game {
 			$arenas.appendChild($reloadDiv);
 
 			$reloadButton.addEventListener('click', () => {
-				window.location.reload();
+				window.location.pathname = '/SelectPlayer/index.html';
+				//window.location.reload();
 			});
 		}
 

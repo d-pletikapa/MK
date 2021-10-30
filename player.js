@@ -1,10 +1,40 @@
-export class Player {
+export const createElement = (tag, className) => {
+	const $tag = document.createElement(tag);
+	if (className) {
+		$tag.classList.add(className);
+	}
+	return $tag;
+};
+
+export default class Player {
 	constructor(props) {
 		//console.log(props);
 		this.player = props.player;
 		this.name = props.name;
 		this.hp = props.hp;
 		this.img = props.img;
+		this.rootSelector = props.rootSelector;
+
+	};
+
+	createPlayer = () => {
+		const $arenas = document.querySelector(`.${this.rootSelector}`);
+		const $player = createElement('div', `player${this.player}`);
+		const $progressbar = createElement('div', 'progressbar');
+		const $life = createElement('div', 'life');
+		const $name = createElement('div', 'name');
+		const $character = createElement('div', 'character');
+		const $characterImg = createElement('img');
+		$player.appendChild($character);
+		$player.appendChild($progressbar);
+		$character.appendChild($characterImg);
+		$progressbar.appendChild($life);
+		$progressbar.appendChild($name);
+
+		$characterImg.src = this.img;
+		$life.style.width = this.hp;
+		$name.innerText = this.name;
+		$arenas.appendChild($player);
 	};
 
 	elHP = () => {
@@ -27,3 +57,4 @@ export class Player {
 		console.log(this.name + 'Fight...');
 	};
 };
+
