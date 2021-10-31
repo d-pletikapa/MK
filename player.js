@@ -1,3 +1,4 @@
+import { Game } from './game.js';
 export const createElement = (tag, className) => {
 	const $tag = document.createElement(tag);
 	if (className) {
@@ -14,7 +15,6 @@ export default class Player {
 		this.hp = props.hp;
 		this.img = props.img;
 		this.rootSelector = props.rootSelector;
-
 	};
 
 	createPlayer = () => {

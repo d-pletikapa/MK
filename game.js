@@ -2,6 +2,7 @@ import { logs } from './logs.js';
 import Player from './player.js';
 import { createElement } from './player.js';
 
+
 let player1;
 let player2;
 export class Game {
@@ -9,15 +10,33 @@ export class Game {
 
 	getPlayer = async () => {
 		const body = await fetch('https://reactmarathon-api.herokuapp.com/api/mk/players', { method: 'GET' }).then(res => res.json());
-		console.log('body:', body);
 		return body;
 	};
 
 	getEnemyPlayer = async () => {
 		const enemyBody = await fetch('https://reactmarathon-api.herokuapp.com/api/mk/player/choose', { method: 'GET' }).then(res => res.json());
-		console.log('body:', enemyBody);
 		return enemyBody;
 	};
+
+	getEnemyAttack = async ({ hit, defence } = playerAttack()) => {
+		const body = await fetch('http://reactmarathon-api.herokuapp.com/api/mk/player/fight', {
+			method: 'POST',
+			body: JSON.stringify({
+				hit: hit,
+				defence: defence,
+			})
+		});
+		let result = await body.json();
+
+		return result;
+	};
+
+	fight(result) {
+		const { player1: { hit: hitEnemy, defence: DefenceEnemy, value: valueEnemy } } = result;
+		const { player2: { hit: playerHit, defence: playerDefence, value: playerValue } } = result;
+	};
+
+	//получить {player1, player2} c АПИ и "деструктурировать" их по playerHit, playerDefence, playerValue, hitEnemy, defenceEnemy, valueEnemy — один вызов апи и ///деструктурирование
 
 	start = async () => {
 
@@ -111,46 +130,24 @@ export class Game {
 			e.preventDefault();
 
 			const { hit: hitEnemy, defence: DefenceEnemy, value: valueEnemy } = enemyAttack();
-			const { hit, defence, value } = playerAttack();
+			const { hit: playerHit, defence: playerDefence, value: playerValue } = playerAttack();
 
 			if (player1.hp != 0 || player2.hp != 0) {
 
-				if (defence !== hitEnemy) {
+				if (playerDefence !== hitEnemy) {
 					player1.changeHP(valueEnemy);
 					player1.renderHP();
 					generateLogs('hit', player2, player1);
 				}
 
-				if (DefenceEnemy !== hit) {
-					player2.changeHP(value);
+				if (DefenceEnemy !== playerHit) {
+					player2.changeHP(playerValue);
 					player2.renderHP();
 					generateLogs('hit', player1, player2);
 				}
 				showResult();
 			}
 		});
-	
-				const enemyAttack = () => {
-					const hit = ATTACK[getRandom(3) - 1]
-					const defence = ATTACK[getRandom(3) - 1]
-					return {
-						value: getRandom(HIT[hit]),
-						hit,
-						defence,
-					}
-				};
-					
-		// const getEnemyAttack = async ({ hit, defence } = playerAttack()) => {
-		// 	const body = await fetch('http://reactmarathon-api.herokuapp.com/api/mk/player/fight', {
-		// 		method: 'POST',
-		// 		body: JSON.stringify({
-		// 			hit: hit,
-		// 			defence: defence,
-		// 		})
-		// 	});
-		// 	let result = await body.json();
-		// 	return result;
-		// };
 
 		function playerAttack() {
 			const attack = {};
@@ -168,10 +165,15 @@ export class Game {
 			return attack;
 		};
 
-		// fight = async () => {
-		// 	const { player1: { hit: hit, defence: defence, value }, player2: { hit: hitEnemy, defence: DefenceEnemy, valueEnemy } } = await this.getEnemyAttack();
+		// const enemyAttack = () => {
+		// 	const hit = ATTACK[getRandom(3) - 1]
+		// 	const defence = ATTACK[getRandom(3) - 1]
+		// 	return {
+		// 		value: getRandom(HIT[hit]),
+		// 		hit,
+		// 		defence,
+		// 	}
 		// };
-
 
 		function showResult() {
 			if (player1.hp === 0 && player2.hp > player1.hp) {
@@ -216,6 +218,5 @@ export class Game {
 				//window.location.reload();
 			});
 		}
-
 	};
 };

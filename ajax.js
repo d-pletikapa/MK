@@ -4,7 +4,7 @@
 // 	console.log(response)
 // 	return response.json();
 // }).then(data => { console.log(data), players = data });
-//console.log('players:', players)
+// console.log('players:', players)
 
 // async function getPlayers() {
 // 	console.log('Start:');
@@ -16,17 +16,17 @@
 
 // getPlayers();
 
-/*
-const q = fetch('https://reactmarathon-api.herokuapp.com/api/mk/players', {//method: 'GET',//method: 'POST',});
-console.log('q:', q)
-q.then(response => {
-	console.log(response)
-	return response.json();
-}).then(data => { console.log(data), players = data });
-*/
+
+// const q = fetch('https://reactmarathon-api.herokuapp.com/api/mk/players', {//method: 'GET',//method: 'POST',});
+// 	console.log('q:', q)
+// q.then(response => {
+// 		console.log(response)
+// 		return response.json();
+// 	}).then(data => { console.log(data), players = data });
 
 
-// async function getPlayers() {
+
+// 	async function getPlayers() {
 // 	const q = await fetch('https://reactmarathon-api.herokuapp.com/api/mk/players');
 // 	const body = await q.json();
 // 	console.log('body:', body);
@@ -35,12 +35,12 @@ q.then(response => {
 // 	getPlayers();
 
 
-// 9 - е Задание
+// // 9 - е Задание
 // console.log('Start');
 
-// setTimeout(function () {
-// 	console.log('Continue');
-// }, 2000);
+// 	setTimeout(function() {
+// 		console.log('Continue');
+// 	}, 2000);
 // console.log('Finish');
 
 // const q = new Promise(function (resolve, reject) {
@@ -50,7 +50,7 @@ q.then(response => {
 // 		msg: 'Sucsess'
 // 	};
 // 	resolve(data);
-	// reject('SOme error');
+// 	reject('SOme error');
 // });
 
 // console.log('q:', q);
