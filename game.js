@@ -18,25 +18,22 @@ export class Game {
 		return enemyBody;
 	};
 
-	getEnemyAttack = async ({ hit, defence } = playerAttack()) => {
-		const body = await fetch('http://reactmarathon-api.herokuapp.com/api/mk/player/fight', {
+	getEnemyAttack(hit, defence) {
+
+		return fetch('http://reactmarathon-api.herokuapp.com/api/mk/player/fight', {
 			method: 'POST',
 			body: JSON.stringify({
 				hit: hit,
 				defence: defence,
 			})
-		});
-		let result = await body.json();
-
-		return result;
+		}).then(res => res.json().catch(error => console.log(error.message)));
 	};
 
-	fight(result) {
-		const { player1: { hit: hitEnemy, defence: DefenceEnemy, value: valueEnemy } } = result;
-		const { player2: { hit: playerHit, defence: playerDefence, value: playerValue } } = result;
+	fight = async () => {
+		const { player1, player2 } = await this.getEnemyAttack();
+		console.log(player1, player2);
 	};
 
-	//получить {player1, player2} c АПИ и "деструктурировать" их по playerHit, playerDefence, playerValue, hitEnemy, defenceEnemy, valueEnemy — один вызов апи и ///деструктурирование
 
 	start = async () => {
 
@@ -94,9 +91,9 @@ export class Game {
 		// 	img: 'http://reactmarathon-api.herokuapp.com/assets/subzero.gif',
 		// })
 
-		generateLogs('start', player1, player2);
+		generateLogs('start', player1, player2, valueEn);
 
-		function generateLogs(type, { name, hp } = {}, { name: playerName2, hp: playerHp2 } = {}) {
+		function generateLogs(type, { name, hp } = {}, { name: playerName2, hp: playerHp2 } = {}, valueEn) {
 			let text;
 			let el;
 			let currentTime = new Date().toLocaleTimeString().slice(0, 5);
@@ -104,7 +101,7 @@ export class Game {
 			switch (type) {
 				case 'hit':
 					text = logs[type][getRandom(logs[type].length - 1)].replace('[playerKick]', name).replace('[playerDefence]', playerName2);
-					el = `<p>${currentTime} ${text} -${enemyAttack().value}HP. ${playerName2} ${playerHp2}/100.</p>`;
+					el = `<p>${currentTime} ${text} -${valueEn}HP. ${playerName2} ${playerHp2}/100.</p>`;
 					break;
 				case 'defence':
 					text = logs[type][getRandom(logs[type].length - 1)].replace('[playerKick]', playerName2).replace('[playerDefence]', name);
@@ -126,24 +123,39 @@ export class Game {
 			$chat.insertAdjacentHTML('afterbegin', el);
 		};
 
-		$formFight.addEventListener('submit', (e) => {
+		$formFight.addEventListener('submit', async (e) => {
 			e.preventDefault();
+			//const { hit: hitEnemy, defence: DefenceEnemy, value: valueEnemy } = enemyAttack();
+			//const { hit: playerHit, defence: playerDefence, value: playerValue } = playerAttack();
+			const { hit, defence } = playerAttack();
 
-			const { hit: hitEnemy, defence: DefenceEnemy, value: valueEnemy } = enemyAttack();
-			const { hit: playerHit, defence: playerDefence, value: playerValue } = playerAttack();
+			const {
+				player1: {
+					hit: playerHit,
+					value: playerValue,
+					defence: playerDefence
+				},
+				player2: {
+					hit: hitEnemy,
+					value: valueEnemy,
+					defence: DefenceEnemy
+				},
+			} = await
+					this.getEnemyAttack(hit, defence);
+
 
 			if (player1.hp != 0 || player2.hp != 0) {
 
 				if (playerDefence !== hitEnemy) {
 					player1.changeHP(valueEnemy);
 					player1.renderHP();
-					generateLogs('hit', player2, player1);
+					generateLogs('hit', player2, player1, valueEnemy);
 				}
 
 				if (DefenceEnemy !== playerHit) {
 					player2.changeHP(playerValue);
 					player2.renderHP();
-					generateLogs('hit', player1, player2);
+					generateLogs('hit', player1, player2, valueEnemy);
 				}
 				showResult();
 			}
