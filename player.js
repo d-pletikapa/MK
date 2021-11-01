@@ -1,4 +1,3 @@
-import { Game } from './game.js';
 export const createElement = (tag, className) => {
 	const $tag = document.createElement(tag);
 	if (className) {
