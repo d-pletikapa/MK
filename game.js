@@ -14,14 +14,14 @@ export class Game {
 			player: 1,
 			name: 'Scorpion',
 			hp: 30,
-			img: 'http://reactmarathon-api.herokuapp.com/assets/scorpion.gif',
+			img: '/assets/scorpion.gif',
 		})
 
 		const player2 = new Player({
 			player: 2,
 			name: 'Subzero',
 			hp: 30,
-			img: 'http://reactmarathon-api.herokuapp.com/assets/subzero.gif',
+			img: '/assets/subzero.gif',
 		})
 
 		const createElement = (tag, className) => {
